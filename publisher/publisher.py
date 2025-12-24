@@ -1,20 +1,16 @@
-import os
-import time
-import requests
+import requests, uuid, random, time, os
+from datetime import datetime
 
-URL = os.getenv("AGGREGATOR_URL", "http://aggregator:8080/publish")
+URL = os.getenv("TARGET_URL")
 
-event = {
-    "service": "publisher",
-    "message": "hello world"
-}
-
-for i in range(10):  # coba 10x
-    try:
-        print(f"Trying to connect... attempt {i+1}")
-        requests.post(URL, json=[event], timeout=3)
-        print("Publish success")
-        break
-    except Exception as e:
-        print("Aggregator not ready, retrying...", e)
-        time.sleep(2)
+for i in range(1000):
+    eid = random.choice([str(uuid.uuid4()), "DUPLICATE-ID"])
+    event = {
+        "topic": "orders",
+        "event_id": eid,
+        "timestamp": datetime.utcnow().isoformat(),
+        "source": "publisher",
+        "payload": {"i": i}
+    }
+    requests.post(URL, json=[event])
+    time.sleep(0.01)

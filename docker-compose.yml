@@ -13,11 +13,6 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
   publisher:
     build: ./publisher

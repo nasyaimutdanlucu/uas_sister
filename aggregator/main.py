@@ -1,16 +1,14 @@
 from fastapi import FastAPI
-from .models import Event
+from models import Event
 import redis.asyncio as redis
 import os, asyncio
-from .consumer import consumer
+from consumer import consumer
 
 app = FastAPI()
-r = None
+r = redis.from_url(os.getenv("BROKER_URL"))
 
 @app.on_event("startup")
 async def startup():
-    global r
-    r = redis.from_url(os.getenv("BROKER_URL"))
     asyncio.create_task(consumer())
 
 @app.post("/publish")
@@ -26,7 +24,3 @@ async def get_events():
 @app.get("/stats")
 async def stats():
     return {"received": 0, "unique_processed": 0}
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
